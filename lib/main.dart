@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                       RaisedButton(
-                        child: CustomText("Votre age : ${(dateTimeItem!=null)? dateTimeItem.toString() : ''}", color: Colors.white, weight: FontWeight.bold,),
+                        child: CustomText("Votre age : ${(dateTimeItem!=null)? responseAgeMethod().toInt() : ''}", color: Colors.white, weight: FontWeight.bold,),
                           color: type,
                           onPressed: showBirthDate
                       ),
@@ -194,13 +194,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<Null> showEstimation() async {
     return showDialog(
         context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext estimationContext) {
           return SimpleDialog(
             backgroundColor: Colors.white,
 
             children: <Widget>[
-
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  CustomText("Votre métabolisme basal est de ${methodCalCount()} ", color: type,),
+                  CustomText("Votre besoin journalier est de ${(methodCalCount().toDouble()*methodActivityCount()).toInt()}", color: type,),
+                ],
+              )
             ],
           );
       }
@@ -227,4 +233,39 @@ class _MyHomePageState extends State<MyHomePage> {
       showError();
     }
   }
+
+  double responseAgeMethod() {
+    var dateSelected = dateTimeItem;
+    var dateNow = DateTime.now();
+    var difference = dateNow.difference(dateSelected);
+    double d = (difference.inDays/365).toDouble();
+    return d;
+  }
+
+  int methodCalCount() {
+    double weight = double.parse(textItem);
+    if(type==Colors.red) {
+      double x = 655.0955 + (9.5634*weight) + (1.8496*sliderItem) - (4.6756*responseAgeMethod());
+      return x.toInt();
+    }
+    else {
+      double x = 666.4730 + (13.7516*weight) + (5.0033*sliderItem) - (6.7550*responseAgeMethod());
+      return x.toInt();
+    }
+  }
+
+  double methodActivityCount() {
+    switch(activityList[selectActivity]) {
+      case "Low":
+        double r = 1.2;
+        return r;
+      case "Medium":
+        double r = 1.5;
+        return r;
+      case "High":
+        double r = 1.8;
+        return r;
+    }
+  }
+
 }
